@@ -121,21 +121,33 @@ L.Control.SideBySide = L.Control.extend({
   },
 
   _updateClip: function () {
+    var brInfo = navigator.appVersion
+    var safariFlag = brInfo.search('iPhone OS| MAC OS X')
     var map = this._map
     var nw = map.containerPointToLayerPoint([0, 0])
     var se = map.containerPointToLayerPoint(map.getSize())
     var clipX = nw.x + this.getPosition()
     var dividerX = this.getPosition()
-
     this._divider.style.left = dividerX + 'px'
     this.fire('dividermove', {x: dividerX})
+    var clipPathLeft = 'polygon(' + nw.x + 'px' + ' ' + nw.y + 'px' + ',' + clipX + 'px' + ' ' + nw.y + 'px' + ',' + clipX + 'px' + ' ' + se.y + 'px' + ',' + nw.x + 'px' + ' ' + se.y + 'px)'
+    var clipPathRight = 'polygon(' + clipX + 'px' + ' ' + nw.y + 'px' + ',' + se.x + 'px' + ' ' + nw.y + 'px' + ',' + se.x + 'px' + ' ' + se.y + 'px' + ',' + clipX + 'px' + ' ' + se.y + 'px)'
     var clipLeft = 'rect(' + [nw.y, clipX, se.y, nw.x].join('px,') + 'px)'
     var clipRight = 'rect(' + [nw.y, se.x, se.y, clipX].join('px,') + 'px)'
-    if (this._leftLayer) {
-      this._leftLayer.getContainer().style.clip = clipLeft
-    }
-    if (this._rightLayer) {
-      this._rightLayer.getContainer().style.clip = clipRight
+    if (safariFlag === -1) {
+      if (this._leftLayer) {
+        this._leftLayer.getContainer().style.clip = clipLeft
+      }
+      if (this._rightLayer) {
+        this._rightLayer.getContainer().style.clip = clipRight
+      }
+    } else {
+      if (this._leftLayer) {
+        this._leftLayer.getContainer().style.clipPath = clipPathLeft
+      }
+      if (this._rightLayer) {
+        this._rightLayer.getContainer().style.clipPath = clipPathRight
+      }
     }
   },
 
